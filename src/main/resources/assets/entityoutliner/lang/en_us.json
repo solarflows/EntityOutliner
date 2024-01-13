@@ -11,6 +11,8 @@
   "button.entity-outliner.off": "Toggled Off",
   "button.entity-outliner.notify.tooltip-on": "Notify On",
   "button.entity-outliner.notify.tooltip-off": "Notify Off",
+  "button.entity-outliner.team-color-on": "Team Color On",
+  "button.entity-outliner.team-color-off": "Team Color Off",
   "gui.entity-outliner.no_results": "No results",
   "chat.entity-outliner.found": "Found entity %s at %s"
 }

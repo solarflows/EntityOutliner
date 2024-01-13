@@ -31,6 +31,7 @@ public class EntityOutliner implements ClientModInitializer {
     private static final Gson GSON = new Gson();
 
     public static boolean outliningEntities;
+    public static boolean preferTeamColor = true;
     public final static Map<EntityType<?>, OutlineConfig> entityTypeOutlineConfig = new HashMap<>();
 
     @Override

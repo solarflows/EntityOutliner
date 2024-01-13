@@ -11,6 +11,8 @@
   "button.entity-outliner.off": "Désactiver",
   "button.entity-outliner.notify.tooltip-on": "Activer notification",
   "button.entity-outliner.notify.tooltip-off": "Désactiver notification",
+  "button.entity-outliner.team-color-on": "Activer couleurs de l'équipe",
+  "button.entity-outliner.team-color-off": "Désactiver couleurs de l'équipe",
   "gui.entity-outliner.no_results": "Aucun résultat",
   "chat.entity-outliner.found": "Entité %s trouvée à %s"
 }

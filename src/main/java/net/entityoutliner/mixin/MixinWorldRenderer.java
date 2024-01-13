@@ -25,7 +25,10 @@ public abstract class MixinWorldRenderer {
             && vertexConsumers instanceof OutlineVertexConsumerProvider outlineVertexConsumers
             && EntityOutliner.entityTypeOutlineConfig.containsKey(entity.getType())) {
 
-            Integer colorValue = getTeamColor(entity);
+            Integer colorValue = null;
+            if (EntityOutliner.preferTeamColor) {
+                colorValue = getTeamColor(entity);
+            }
 
             final OutlineConfig outlineConfig = EntityOutliner.entityTypeOutlineConfig.get(entity.getType());
 

@@ -11,6 +11,8 @@
   "button.entity-outliner.off": "已关闭",
   "button.entity-outliner.notify.tooltip-on": "通知",
   "button.entity-outliner.notify.tooltip-off": "通知关闭",
+  "button.entity-outliner.team-color-on": "显示团队颜色",
+  "button.entity-outliner.team-color-off": "不显示团队颜色",
   "gui.entity-outliner.no_results": "无结果",
   "chat.entity-outliner.found": "在 %s 找到实体 %s"
 }

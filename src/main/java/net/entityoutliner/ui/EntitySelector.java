@@ -76,6 +76,15 @@ public class EntitySelector extends Screen {
                 }
             ),
 
+            // toggle team colors
+            ButtonWidget.builder(
+                Text.translatable("button.entity-outliner.team-color-on"),
+                (button) -> {
+                    EntityOutliner.preferTeamColor = !EntityOutliner.preferTeamColor;
+                    button.setMessage(Text.translatable(EntityOutliner.preferTeamColor ? "button.entity-outliner.team-color-on" : "button.entity-outliner.team-color-off"));
+                }
+            ),
+
             // done
             ButtonWidget.builder(
                 Text.translatable("button.entity-outliner.done"),
