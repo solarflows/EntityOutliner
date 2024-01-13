@@ -5,10 +5,19 @@
   "name": "Entity Outliner",
   "description": "Allows you to select entity types to outline, making them visible through all obstructions within render distance.",
   "authors": [
-    "adamviola"
+    {
+      "name": "Adam Viola",
+      "contact": {
+        "homepage": "https://github.com/adamviola"
+      }
+    }
   ],
   "contributors": [
-    "n0rbyt3"
+    "Columner",
+    "CofiPRT",
+    "n0rbyt3",
+    "fr_fr: Calvineries",
+    "zh_cn: GodGun968"
   ],
   "contact": {
     "homepage": "https://github.com/adamviola/EntityOutliner",
