@@ -1,56 +1,60 @@
 package net.entityoutliner;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import net.entityoutliner.ui.ColorWidget.Color;
 import net.entityoutliner.ui.EntitySelector;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
-import net.minecraft.registry.Registries;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class EntityOutliner implements ClientModInitializer {
     private static final Gson GSON = new Gson();
     public static boolean outliningEntities;
 
-    private static final KeyBinding CONFIG_BIND = new KeyBinding(
-        "key.entity-outliner.selector",
-        InputUtil.Type.KEYSYM,
-        GLFW.GLFW_KEY_SEMICOLON,
-        "title.entity-outliner.title"
-    );
-
-    private static final KeyBinding OUTLINE_BIND = new KeyBinding(
-        "key.entity-outliner.outline",
-        InputUtil.Type.KEYSYM,
-        GLFW.GLFW_KEY_O,
-        "title.entity-outliner.title"
-    );
-
     @Override
     public void onInitializeClient() {
-        KeyBindingHelper.registerKeyBinding(CONFIG_BIND);
-        KeyBindingHelper.registerKeyBinding(OUTLINE_BIND);
+        final KeyBinding config = new KeyBinding(
+            "key.entity-outliner.selector",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_SEMICOLON,
+            "title.entity-outliner.title"
+        );
+
+        final KeyBinding outline = new KeyBinding(
+            "key.entity-outliner.outline",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_O,
+            "title.entity-outliner.title"
+        );
+
+        KeyBindingHelper.registerKeyBinding(config);
+        KeyBindingHelper.registerKeyBinding(outline);
 
         loadConfig();
 
-        ClientTickEvents.END_CLIENT_TICK.register(this::onEndTick);
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (outline.wasPressed()) {
+                outliningEntities = !outliningEntities;
+            }
+
+            if (config.isPressed()) {
+                client.setScreen(new EntitySelector(null));
+            }
+        });
     }
 
     private static Path getConfigPath() {
@@ -58,13 +62,16 @@ public class EntityOutliner implements ClientModInitializer {
     }
 
     public static void saveConfig() {
-        JsonObject config = new JsonObject();
+        final JsonObject config = new JsonObject();
 
-        List<List<String>> outlinedEntityNames = EntitySelector.outlinedEntityTypes.entrySet().stream()
-            .map(entry -> List.of(EntityType.getId(entry.getKey()).toString(), entry.getValue().name()))
-            .collect(Collectors.toList());
-
-        config.add("outlinedEntities", GSON.toJsonTree(outlinedEntityNames));
+        JsonArray outlinedEntities = new JsonArray();
+        for (Map.Entry<EntityType<?>, Color> entry : EntitySelector.outlinedEntityTypes.entrySet()) {
+            final JsonArray list = new JsonArray(2);
+            list.add(EntityType.getId(entry.getKey()).toString());
+            list.add(entry.getValue().name());
+            outlinedEntities.add(list);
+        }
+        config.add("outlinedEntities", outlinedEntities);
 
         try {
             Files.write(getConfigPath(), GSON.toJson(config).getBytes());
@@ -77,33 +84,24 @@ public class EntityOutliner implements ClientModInitializer {
         try {
             JsonObject config = GSON.fromJson(new String(Files.readAllBytes(getConfigPath())), JsonObject.class);
             if (config.has("outlinedEntities")) {
-                Type setType = new TypeToken<List<List<String>>>() {
-                }.getType();
-                List<List<String>> outlinedEntityNames = GSON.fromJson(config.get("outlinedEntities"), setType);
+                final JsonArray outlinedEntities = config.getAsJsonArray("outlinedEntities");
+                for (JsonElement e : outlinedEntities) {
+                    final JsonArray list = e.getAsJsonArray();
+                    final Optional<EntityType<?>> entityType = list.size() > 0 ? EntityType.get(list.get(0).getAsString()) : Optional.empty();
+                    if (entityType.isEmpty()) {
+                        continue;
+                    }
+                    final Optional<Color> color = list.size() > 1 ? Color.of(list.get(1).getAsString()) : Optional.empty();
 
-                Map<EntityType<?>, Color> outlinedEntityTypes = outlinedEntityNames.stream()
-                    .collect(Collectors.toMap(list -> EntityType.get(list.get(0)).get(), list -> Color.valueOf(list.get(1))));
-
-                for (EntityType<?> entityType : Registries.ENTITY_TYPE)
-                    if (outlinedEntityTypes.containsKey(entityType))
-                        EntitySelector.outlinedEntityTypes.put(entityType, outlinedEntityTypes.get(entityType));
+                    EntitySelector.outlinedEntityTypes.put(entityType.get(), color.orElse(Color.of(entityType.get().getSpawnGroup())));
+                }
             }
-        } catch (IOException | JsonSyntaxException ex) {
+        } catch (Throwable ex) {
             logException(ex, "Failed to load EntityOutliner config");
         }
     }
 
-    private void onEndTick(MinecraftClient client) {
-        while (OUTLINE_BIND.wasPressed()) {
-            outliningEntities = !outliningEntities;
-        }
-
-        if (CONFIG_BIND.isPressed()) {
-            client.setScreen(new EntitySelector(null));
-        }
-    }
-
-    public static void logException(Exception ex, String message) {
+    public static void logException(Throwable ex, String message) {
         System.err.printf("[EntityOutliner] %s (%s: %s)", message, ex.getClass().getSimpleName(), ex.getLocalizedMessage());
     }
 }

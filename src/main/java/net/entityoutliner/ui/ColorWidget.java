@@ -10,7 +10,9 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
 public class ColorWidget extends PressableWidget {
@@ -79,6 +81,12 @@ public class ColorWidget extends PressableWidget {
             this.red = red;
             this.green = green;
             this.blue = blue;
+        }
+
+        public static Optional<Color> of(String name) {
+            return Arrays.stream(colors)
+                .filter(c -> c.name().equals(name))
+                .findFirst();
         }
 
         public static Color of(SpawnGroup group) {
