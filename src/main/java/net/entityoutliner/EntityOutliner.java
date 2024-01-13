@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.entityoutliner.ui.ColorWidget;
 import net.entityoutliner.ui.EntitySelector;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -120,7 +119,7 @@ public class EntityOutliner implements ClientModInitializer {
             final EntityType<?> entityType = entity.getType();
             if (outliningEntities && client.player != null && isNotificationEnabled(entityType)) {
                 final OutlineConfig outlineConfig = entityTypeOutlineConfig.get(entityType);
-                final ColorWidget.Color color = outlineConfig.getColor();
+                final Color color = outlineConfig.getColor();
                 client.player.sendMessage(chatPrefix.copy().append(
                         Text.translatable("chat.entity-outliner.found",
                             entity.getType().getName()
@@ -182,12 +181,12 @@ public class EntityOutliner implements ClientModInitializer {
                     if (entityType.isEmpty()) {
                         continue;
                     }
-                    final Optional<ColorWidget.Color> color = list.size() > 1 ? ColorWidget.Color.of(list.get(1).getAsString()) : Optional.empty();
+                    final Optional<Color> color = list.size() > 1 ? Color.of(list.get(1).getAsString()) : Optional.empty();
                     final boolean notification = list.size() > 2 && list.get(2).getAsBoolean();
                     final Optional<EntityAge> age = list.size() > 3 && babyTypes.contains(entityType.get()) ? EntityAge.of(list.get(3).getAsString()) : Optional.empty();
 
                     entityTypeOutlineConfig.put(entityType.get(), new OutlineConfig(
-                        color.orElse(ColorWidget.Color.of(entityType.get().getSpawnGroup())),
+                        color.orElse(Color.of(entityType.get().getSpawnGroup())),
                         notification,
                         age.orElse(EntityAge.BOTH)
                     ));

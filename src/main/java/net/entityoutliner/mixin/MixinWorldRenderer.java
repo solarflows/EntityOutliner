@@ -1,8 +1,8 @@
 package net.entityoutliner.mixin;
 
+import net.entityoutliner.Color;
 import net.entityoutliner.EntityOutliner;
 import net.entityoutliner.OutlineConfig;
-import net.entityoutliner.ui.ColorWidget.Color;
 import net.minecraft.client.render.OutlineVertexConsumerProvider;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
