@@ -12,8 +12,7 @@
   ],
   "contact": {
     "homepage": "https://github.com/adamviola/EntityOutliner",
-    "sources": "https://github.com/adamviola/EntityOutliner",
-    "issues": "https://github.com/adamviola/EntityOutliner/issues"
+    "sources": "https://github.com/adamviola/EntityOutliner"
   },
   "license": "MIT",
   "icon": "assets/entityoutliner/icon.png",
