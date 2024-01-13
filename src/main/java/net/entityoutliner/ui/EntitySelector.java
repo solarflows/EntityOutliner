@@ -31,7 +31,9 @@ public class EntitySelector extends Screen {
 
     @Override
     public void close() {
-        this.client.setScreen(this.parent);
+        if (this.client != null) {
+            this.client.setScreen(this.parent);
+        }
     }
 
     @Override
@@ -105,7 +107,7 @@ public class EntitySelector extends Screen {
         searcher = new HashMap<>();
 
         // Initialize no-text results
-        List<EntityType<?>> allResults = new ArrayList<EntityType<?>>();
+        List<EntityType<?>> allResults = new ArrayList<>();
         searcher.put("", allResults);
 
         // Get sorted list of entity types
@@ -138,7 +140,7 @@ public class EntitySelector extends Screen {
                     if (searcher.containsKey(prefix)) {
                         results = searcher.get(prefix);
                     } else {
-                        results = new ArrayList<EntityType<?>>();
+                        results = new ArrayList<>();
                         searcher.put(prefix, results);
                     }
 
@@ -178,10 +180,10 @@ public class EntitySelector extends Screen {
 
                 for (SpawnGroup category : SpawnGroup.values()) {
                     if (resultsByCategory.containsKey(category)) {
-                        this.list.addListEntry(EntityListWidget.HeaderEntry.create(category, this.client.textRenderer));
+                        this.list.addListEntry(EntityListWidget.HeaderEntry.create(category, this.textRenderer));
 
                         for (EntityType<?> entityType : resultsByCategory.get(category)) {
-                            this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.client.textRenderer));
+                            this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.textRenderer));
                         }
 
                     }
@@ -189,11 +191,11 @@ public class EntitySelector extends Screen {
 
             } else {
                 for (EntityType<?> entityType : results) {
-                    this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.client.textRenderer));
+                    this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.textRenderer));
                 }
             }
         } else { // If there are no results, let the user know
-            this.list.addListEntry(EntityListWidget.HeaderEntry.create(null, this.client.textRenderer));
+            this.list.addListEntry(EntityListWidget.HeaderEntry.create(null, this.textRenderer));
         }
 
         // This prevents an overscroll when the user is already scrolled down and the results list is shortened
