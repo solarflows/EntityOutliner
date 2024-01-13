@@ -13,6 +13,9 @@
   "button.entity-outliner.notify.tooltip-off": "通知关闭",
   "button.entity-outliner.team-color-on": "显示团队颜色",
   "button.entity-outliner.team-color-off": "不显示团队颜色",
+  "button.entity-outliner.age.tooltip-baby": "只画出婴儿的轮廓",
+  "button.entity-outliner.age.tooltip-adult": "只画出成人的轮廓",
+  "button.entity-outliner.age.tooltip-both": "勾勒出每个人的轮廓",
   "gui.entity-outliner.no_results": "无结果",
   "chat.entity-outliner.found": "在 %s 找到实体 %s"
 }

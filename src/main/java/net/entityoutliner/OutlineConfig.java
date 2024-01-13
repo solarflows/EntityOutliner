@@ -10,10 +10,12 @@ public class OutlineConfig {
 
     private ColorWidget.Color color;
     private boolean notification;
+    private EntityAge age;
 
-    public OutlineConfig(ColorWidget.Color color, boolean notification) {
+    public OutlineConfig(ColorWidget.Color color, boolean notification, EntityAge age) {
         this.color = color;
         this.notification = notification;
+        this.age = age;
     }
 
     public ColorWidget.Color getColor() {
@@ -32,7 +34,15 @@ public class OutlineConfig {
         this.notification = notification;
     }
 
+    public EntityAge getAge() {
+        return this.age;
+    }
+
+    public void setAge(EntityAge age) {
+        this.age = age;
+    }
+
     public static OutlineConfig of(EntityType<?> entityType) {
-        return new OutlineConfig(ColorWidget.Color.of(entityType.getSpawnGroup()), false);
+        return new OutlineConfig(ColorWidget.Color.of(entityType.getSpawnGroup()), false, EntityAge.BOTH);
     }
 }

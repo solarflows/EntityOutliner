@@ -23,7 +23,7 @@ public abstract class MixinWorldRenderer {
     private void renderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
         if (EntityOutliner.outliningEntities
             && vertexConsumers instanceof OutlineVertexConsumerProvider outlineVertexConsumers
-            && EntityOutliner.entityTypeOutlineConfig.containsKey(entity.getType())) {
+            && EntityOutliner.shouldOutline(entity)) {
 
             Integer colorValue = null;
             if (EntityOutliner.preferTeamColor) {

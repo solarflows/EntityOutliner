@@ -13,6 +13,9 @@
   "button.entity-outliner.notify.tooltip-off": "Désactiver notification",
   "button.entity-outliner.team-color-on": "Activer couleurs de l'équipe",
   "button.entity-outliner.team-color-off": "Désactiver couleurs de l'équipe",
+  "button.entity-outliner.age.tooltip-baby": "Activer le contour seulement de bébés",
+  "button.entity-outliner.age.tooltip-adult": "Activer le contour seulement de adultes",
+  "button.entity-outliner.age.tooltip-both": "Activer le contour du tout",
   "gui.entity-outliner.no_results": "Aucun résultat",
   "chat.entity-outliner.found": "Entité %s trouvée à %s"
 }

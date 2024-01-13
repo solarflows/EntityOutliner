@@ -73,6 +73,14 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
             final boolean visible = EntityOutliner.entityTypeOutlineConfig.containsKey(entityType);
             final OutlineConfig outlineConfig = EntityOutliner.entityTypeOutlineConfig.getOrDefault(entityType, OutlineConfig.of(entityType));
 
+            // show age only if supported by entity type
+            final AgeWidget age = EntityOutliner.babyTypes.contains(entityType) ? new AgeWidget(DEFAULT_SIZE, outlineConfig.getAge(),
+                (source, value) -> outlineConfig.setAge(value)
+            ) : null;
+            if (age != null) {
+                age.visible = visible;
+            }
+
             final ColorWidget color = new ColorWidget(DEFAULT_SIZE, outlineConfig.getColor(),
                 (source, value) -> outlineConfig.setColor(value)
             );
@@ -88,6 +96,9 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
             final CheckboxWidget checkbox = CheckboxWidget.builder(entityType.getName(), font)
                 .checked(visible)
                 .callback((source, checked) -> {
+                    if (age != null) {
+                        age.visible = checked;
+                    }
                     color.visible = checked;
                     notify.visible = checked;
                     if (!checked) {
@@ -98,7 +109,13 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
                 })
                 .build();
 
-            return new EntityListWidget.EntityEntry(checkbox, color, notify);
+            final ClickableWidget[] options = new ClickableWidget[2 + (age != null ? 1 : 0)];
+            options[options.length - 1] = notify;
+            options[options.length - 2] = color;
+            if (age != null) {
+                options[0] = age;
+            }
+            return new EntityListWidget.EntityEntry(checkbox, options);
         }
 
         @Override

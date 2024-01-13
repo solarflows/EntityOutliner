@@ -14,7 +14,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -26,6 +28,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class EntityOutliner implements ClientModInitializer {
     private static final Gson GSON = new Gson();
@@ -33,6 +36,47 @@ public class EntityOutliner implements ClientModInitializer {
     public static boolean outliningEntities;
     public static boolean preferTeamColor = true;
     public final static Map<EntityType<?>, OutlineConfig> entityTypeOutlineConfig = new HashMap<>();
+
+    public final static Set<EntityType<?>> babyTypes = Set.of(
+        EntityType.BEE,
+        EntityType.CAT,
+        EntityType.CHICKEN,
+        EntityType.COW,
+        EntityType.DONKEY,
+        EntityType.FOX,
+        EntityType.HOGLIN,
+        EntityType.HORSE,
+        EntityType.MOOSHROOM,
+        EntityType.MULE,
+        EntityType.PANDA,
+        EntityType.POLAR_BEAR,
+        EntityType.OCELOT,
+        EntityType.PIG,
+        EntityType.PIGLIN,
+        EntityType.RABBIT,
+        EntityType.SALMON,
+        EntityType.SHEEP,
+        EntityType.STRIDER,
+        EntityType.TURTLE,
+        EntityType.GOAT,
+        EntityType.VILLAGER,
+        EntityType.WOLF,
+        EntityType.ZOMBIE,
+        EntityType.ZOMBIFIED_PIGLIN
+    );
+
+    public static boolean shouldOutline(Entity entity) {
+        if (!outliningEntities) {
+            return false;
+        }
+        final OutlineConfig outlineConfig = EntityOutliner.entityTypeOutlineConfig.get(entity.getType());
+
+        return outlineConfig != null && (
+            outlineConfig.getAge() == EntityAge.BOTH ||
+                !(entity instanceof LivingEntity livingEntity) ||
+                (livingEntity.isBaby() ^ outlineConfig.getAge() == EntityAge.ADULT)
+        );
+    }
 
     @Override
     public void onInitializeClient() {
@@ -109,9 +153,12 @@ public class EntityOutliner implements ClientModInitializer {
             final JsonArray list = new JsonArray(4);
             list.add(EntityType.getId(entry.getKey()).toString());
             list.add(outlineConfig.getColor().name());
-            if (outlineConfig.isNotification()) {
+            if (outlineConfig.isNotification() || outlineConfig.getAge() != EntityAge.BOTH) {
                 // use new config format only if required
                 list.add(outlineConfig.isNotification());
+                if (outlineConfig.getAge() != EntityAge.BOTH) {
+                    list.add(outlineConfig.getAge().name());
+                }
             }
             outlinedEntities.add(list);
         }
@@ -137,10 +184,12 @@ public class EntityOutliner implements ClientModInitializer {
                     }
                     final Optional<ColorWidget.Color> color = list.size() > 1 ? ColorWidget.Color.of(list.get(1).getAsString()) : Optional.empty();
                     final boolean notification = list.size() > 2 && list.get(2).getAsBoolean();
+                    final Optional<EntityAge> age = list.size() > 3 && babyTypes.contains(entityType.get()) ? EntityAge.of(list.get(3).getAsString()) : Optional.empty();
 
                     entityTypeOutlineConfig.put(entityType.get(), new OutlineConfig(
                         color.orElse(ColorWidget.Color.of(entityType.get().getSpawnGroup())),
-                        notification
+                        notification,
+                        age.orElse(EntityAge.BOTH)
                     ));
                 }
             }

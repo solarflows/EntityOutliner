@@ -13,6 +13,9 @@
   "button.entity-outliner.notify.tooltip-off": "Notify Off",
   "button.entity-outliner.team-color-on": "Team Color On",
   "button.entity-outliner.team-color-off": "Team Color Off",
+  "button.entity-outliner.age.tooltip-baby": "Outline babies only",
+  "button.entity-outliner.age.tooltip-adult": "Outline adults only",
+  "button.entity-outliner.age.tooltip-both": "Outline babies and adults",
   "gui.entity-outliner.no_results": "No results",
   "chat.entity-outliner.found": "Found entity %s at %s"
 }
