@@ -1,6 +1,7 @@
 package net.entityoutliner.ui;
 
-import net.entityoutliner.ui.ColorWidget.Color;
+import net.entityoutliner.EntityOutliner;
+import net.entityoutliner.OutlineConfig;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -8,7 +9,10 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.CheckboxWidget;
+import net.minecraft.client.gui.widget.ClickableWidget;
+import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
@@ -52,40 +56,59 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
         private final static int DEFAULT_SIZE = 20;
 
         private final CheckboxWidget checkbox;
-        private final ColorWidget color;
-        private final List<PressableWidget> children;
+        private final ClickableWidget[] options;
+        private final List<ClickableWidget> children;
 
-        private EntityEntry(CheckboxWidget checkbox, ColorWidget color) {
+        private EntityEntry(CheckboxWidget checkbox, ClickableWidget... options) {
             this.checkbox = checkbox;
-            this.color = color;
-            this.children = List.of(this.checkbox, this.color);
+            this.options = options;
+
+            final ClickableWidget[] children = new ClickableWidget[options.length + 1];
+            children[0] = checkbox;
+            System.arraycopy(options, 0, children, 1, options.length);
+            this.children = List.of(children);
         }
 
         public static EntityListWidget.EntityEntry create(EntityType<?> entityType, TextRenderer font) {
-            final boolean visible = EntitySelector.outlinedEntityTypes.containsKey(entityType);
+            final boolean visible = EntityOutliner.entityTypeOutlineConfig.containsKey(entityType);
+            final OutlineConfig outlineConfig = EntityOutliner.entityTypeOutlineConfig.getOrDefault(entityType, OutlineConfig.of(entityType));
 
-            final ColorWidget color = new ColorWidget(0, 0, DEFAULT_SIZE, DEFAULT_SIZE, entityType);
+            final ColorWidget color = new ColorWidget(DEFAULT_SIZE, outlineConfig.getColor(),
+                (source, value) -> outlineConfig.setColor(value)
+            );
             color.visible = visible;
+
+            final NotificationWidget notify = new NotificationWidget(
+                DEFAULT_SIZE,
+                outlineConfig.isNotification(),
+                (source, value) -> outlineConfig.setNotification(value)
+            );
+            notify.visible = visible;
 
             final CheckboxWidget checkbox = CheckboxWidget.builder(entityType.getName(), font)
                 .checked(visible)
                 .callback((source, checked) -> {
                     color.visible = checked;
+                    notify.visible = checked;
                     if (!checked) {
-                        EntitySelector.outlinedEntityTypes.remove(entityType);
+                        EntityOutliner.entityTypeOutlineConfig.remove(entityType);
                     } else {
-                        EntitySelector.outlinedEntityTypes.put(entityType, Color.of(entityType.getSpawnGroup()));
+                        EntityOutliner.entityTypeOutlineConfig.put(entityType, outlineConfig);
                     }
                 })
                 .build();
 
-            return new EntityListWidget.EntityEntry(checkbox, color);
+            return new EntityListWidget.EntityEntry(checkbox, color, notify);
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
             final int gap = 5;
-            this.checkbox.setWidth(entryWidth - this.color.getWidth() - gap);
+            int width = entryWidth - gap * this.options.length;
+            for (ClickableWidget e : this.options) {
+                width -= e.getWidth();
+            }
+            this.checkbox.setWidth(width);
 
             for (ClickableWidget c : this.children) {
                 c.setDimensionsAndPosition(c.getWidth(), entryHeight, x, y);

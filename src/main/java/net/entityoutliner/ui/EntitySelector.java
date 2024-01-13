@@ -1,7 +1,6 @@
 package net.entityoutliner.ui;
 
 import net.entityoutliner.EntityOutliner;
-import net.entityoutliner.ui.ColorWidget.Color;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -21,7 +20,6 @@ public class EntitySelector extends Screen {
     private static boolean groupByCategory = true;
     private static String searchText = "";
     private static Map<String, List<EntityType<?>>> searcher = new HashMap<>(); // Prefix -> arr of results
-    public final static Map<EntityType<?>, Color> outlinedEntityTypes = new HashMap<>();
 
     public EntitySelector(Screen parent) {
         super(Text.translatable("title.entity-outliner.selector"));
@@ -64,7 +62,7 @@ public class EntitySelector extends Screen {
             ButtonWidget.builder(
                 Text.translatable("button.entity-outliner.deselect"),
                 (button) -> {
-                    EntitySelector.outlinedEntityTypes.clear();
+                    EntityOutliner.entityTypeOutlineConfig.clear();
                     this.onSearchFieldUpdate(this.searchField.getText());
                 }
             ),

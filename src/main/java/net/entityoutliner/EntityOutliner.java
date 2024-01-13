@@ -4,26 +4,34 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.entityoutliner.ui.ColorWidget.Color;
+import net.entityoutliner.ui.ColorWidget;
 import net.entityoutliner.ui.EntitySelector;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class EntityOutliner implements ClientModInitializer {
     private static final Gson GSON = new Gson();
+
     public static boolean outliningEntities;
+    public final static Map<EntityType<?>, OutlineConfig> entityTypeOutlineConfig = new HashMap<>();
 
     @Override
     public void onInitializeClient() {
@@ -55,6 +63,36 @@ public class EntityOutliner implements ClientModInitializer {
                 client.setScreen(new EntitySelector(null));
             }
         });
+
+        final MutableText chatPrefix = Text.literal("[").formatted(Formatting.GRAY)
+            .append(Text.translatable("title.entity-outliner.title")
+                .formatted(Formatting.RED)
+            ).append(Text.of("]")
+            ).append(Text.literal(" ").formatted(Formatting.RESET));
+
+        ClientEntityEvents.ENTITY_LOAD.register((entity, world) -> {
+            final MinecraftClient client = MinecraftClient.getInstance();
+            final EntityType<?> entityType = entity.getType();
+            if (outliningEntities && client.player != null && isNotificationEnabled(entityType)) {
+                final OutlineConfig outlineConfig = entityTypeOutlineConfig.get(entityType);
+                final ColorWidget.Color color = outlineConfig.getColor();
+                client.player.sendMessage(chatPrefix.copy().append(
+                        Text.translatable("chat.entity-outliner.found",
+                            entity.getType().getName()
+                                .copy()
+                                .withColor(color.toRGB()),
+                            Text.literal(entity.getPos().toString())
+                                .withColor(color.toRGB())
+                        )),
+                    false
+                );
+            }
+        });
+    }
+
+    private static boolean isNotificationEnabled(EntityType<?> entityType) {
+        final OutlineConfig outlineConfig = entityTypeOutlineConfig.get(entityType);
+        return outlineConfig != null && outlineConfig.isNotification();
     }
 
     private static Path getConfigPath() {
@@ -65,10 +103,15 @@ public class EntityOutliner implements ClientModInitializer {
         final JsonObject config = new JsonObject();
 
         JsonArray outlinedEntities = new JsonArray();
-        for (Map.Entry<EntityType<?>, Color> entry : EntitySelector.outlinedEntityTypes.entrySet()) {
-            final JsonArray list = new JsonArray(2);
+        for (Map.Entry<EntityType<?>, OutlineConfig> entry : entityTypeOutlineConfig.entrySet()) {
+            final OutlineConfig outlineConfig = entry.getValue();
+            final JsonArray list = new JsonArray(4);
             list.add(EntityType.getId(entry.getKey()).toString());
-            list.add(entry.getValue().name());
+            list.add(outlineConfig.getColor().name());
+            if (outlineConfig.isNotification()) {
+                // use new config format only if required
+                list.add(outlineConfig.isNotification());
+            }
             outlinedEntities.add(list);
         }
         config.add("outlinedEntities", outlinedEntities);
@@ -91,9 +134,13 @@ public class EntityOutliner implements ClientModInitializer {
                     if (entityType.isEmpty()) {
                         continue;
                     }
-                    final Optional<Color> color = list.size() > 1 ? Color.of(list.get(1).getAsString()) : Optional.empty();
+                    final Optional<ColorWidget.Color> color = list.size() > 1 ? ColorWidget.Color.of(list.get(1).getAsString()) : Optional.empty();
+                    final boolean notification = list.size() > 2 && list.get(2).getAsBoolean();
 
-                    EntitySelector.outlinedEntityTypes.put(entityType.get(), color.orElse(Color.of(entityType.get().getSpawnGroup())));
+                    entityTypeOutlineConfig.put(entityType.get(), new OutlineConfig(
+                        color.orElse(ColorWidget.Color.of(entityType.get().getSpawnGroup())),
+                        notification
+                    ));
                 }
             }
         } catch (Throwable ex) {

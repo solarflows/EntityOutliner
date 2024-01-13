@@ -9,5 +9,8 @@
   "button.entity-outliner.no-categories": "Aucune catégories",
   "button.entity-outliner.on": "Activer",
   "button.entity-outliner.off": "Désactiver",
-  "gui.entity-outliner.no_results": "Aucun résultat"
+  "button.entity-outliner.notify.tooltip-on": "Activer notification",
+  "button.entity-outliner.notify.tooltip-off": "Désactiver notification",
+  "gui.entity-outliner.no_results": "Aucun résultat",
+  "chat.entity-outliner.found": "Entité %s trouvée à %s"
 }

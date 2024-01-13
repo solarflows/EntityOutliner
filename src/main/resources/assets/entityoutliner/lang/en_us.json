@@ -9,5 +9,8 @@
   "button.entity-outliner.no-categories": "No Categories",
   "button.entity-outliner.on": "Toggled On",
   "button.entity-outliner.off": "Toggled Off",
-  "gui.entity-outliner.no_results": "No results"
+  "button.entity-outliner.notify.tooltip-on": "Notify On",
+  "button.entity-outliner.notify.tooltip-off": "Notify Off",
+  "gui.entity-outliner.no_results": "No results",
+  "chat.entity-outliner.found": "Found entity %s at %s"
 }

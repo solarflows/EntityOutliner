@@ -3,9 +3,7 @@ package net.entityoutliner.ui;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.entity.EntityType;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
@@ -15,35 +13,25 @@ import java.util.Map;
 import java.util.Optional;
 
 @Environment(EnvType.CLIENT)
-public class ColorWidget extends PressableWidget {
-    private Color color;
-    private final EntityType<?> entityType;
+public class ColorWidget extends ToggleWidget<ColorWidget.Color> {
 
-    private ColorWidget(int x, int y, int width, int height, Text message, EntityType<?> entityType) {
-        super(x, y, width, height, message);
-        this.entityType = entityType;
-
-        if (EntitySelector.outlinedEntityTypes.containsKey(this.entityType))
-            onShow();
-    }
-
-    public ColorWidget(int x, int y, int width, int height, EntityType<?> entityType) {
-        this(x, y, width, height, Text.translatable("options.chat.color"), entityType);
-    }
-
-    public void onShow() {
-        this.color = EntitySelector.outlinedEntityTypes.get(this.entityType);
+    public ColorWidget(int size, Color value, Callback<Color> callback) {
+        super(size, value, callback, Text.translatable("options.chat.color"));
     }
 
     @Override
-    public void onPress() {
-        this.color = this.color.next();
-        EntitySelector.outlinedEntityTypes.put(this.entityType, this.color);
+    protected Color getNextValue(final Color previous) {
+        return Color.colors[(previous.ordinal() + 1) % Color.colors.length];
+    }
+
+    @Override
+    protected Tooltip getTooltip(final Color value) {
+        return null;
     }
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        int color = ColorHelper.Argb.getArgb(255, this.color.red, this.color.green, this.color.blue);
+        int color = ColorHelper.Argb.getArgb(255, this.value.red, this.value.green, this.value.blue);
         context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
         Color border = this.isFocused() ? Color.WHITE : Color.BLACK;
         context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), ColorHelper.Argb.getArgb(255, border.red, border.green, border.blue));
@@ -93,16 +81,8 @@ public class ColorWidget extends PressableWidget {
             return spawnGroupColors.get(group);
         }
 
-        public Color next() {
-            return get((this.ordinal() + 1) % colors.length);
+        public int toRGB() {
+            return ColorHelper.Argb.getArgb(255, this.red, this.green, this.blue);
         }
-
-        public Color get(int index) {
-            return colors[index];
-        }
-    }
-
-    @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
     }
 }
