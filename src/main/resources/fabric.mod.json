@@ -23,7 +23,7 @@
       "net.entityoutliner.EntityOutliner"
     ],
     "modmenu": [
-      "net.entityoutliner.ui.ModMenuIntegration"
+      "net.entityoutliner.ModMenuIntegration"
     ]
   },
   "mixins": [
