@@ -1,24 +1,23 @@
 package net.entityoutliner.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import net.entityoutliner.ui.ColorWidget.Color;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.CheckboxWidget;
 import net.minecraft.client.gui.widget.ElementListWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.Language;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> {
@@ -27,7 +26,7 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
         super(client, width, height, y, itemHeight);
         this.centerListVertically = false;
     }
-    
+
     public void addListEntry(EntityListWidget.Entry entry) {
         super.addEntry(entry);
     }
@@ -47,7 +46,8 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
     }
 
     @Environment(EnvType.CLIENT)
-    public static abstract class Entry extends ElementListWidget.Entry<EntityListWidget.Entry> { }
+    public static abstract class Entry extends ElementListWidget.Entry<EntityListWidget.Entry> {
+    }
 
     @Environment(EnvType.CLIENT)
     public static class EntityEntry extends EntityListWidget.Entry {
@@ -69,9 +69,9 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
 
         public static EntityListWidget.EntityEntry create(EntityType<?> entityType, int width, TextRenderer font) {
             final CheckboxWidget checkbox = CheckboxWidget.builder(entityType.getName(), font)
-                    .pos(width / 2 - 155, 0)
-                    .checked(EntitySelector.outlinedEntityTypes.containsKey(entityType))
-                    .build();
+                .pos(width / 2 - 155, 0)
+                .checked(EntitySelector.outlinedEntityTypes.containsKey(entityType))
+                .build();
             checkbox.setWidth(310);
             checkbox.setHeight(20);
             return new EntityListWidget.EntityEntry(
@@ -112,7 +112,7 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
             }
 
             return true;
-         }
+        }
 
         @Override
         public List<? extends Element> children() {
@@ -149,7 +149,7 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
             } else {
                 this.title = Language.getInstance().get("gui.entity-outliner.no_results");
             }
-            
+
         }
 
         public static EntityListWidget.HeaderEntry create(SpawnGroup category, TextRenderer font, int width, int height) {

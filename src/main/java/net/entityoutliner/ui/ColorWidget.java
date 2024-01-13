@@ -1,7 +1,5 @@
 package net.entityoutliner.ui;
 
-import java.util.Map;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,6 +10,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
+import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class ColorWidget extends PressableWidget {
@@ -97,5 +97,6 @@ public class ColorWidget extends PressableWidget {
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {}
+    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    }
 }

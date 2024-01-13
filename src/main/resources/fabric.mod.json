@@ -2,7 +2,6 @@
   "schemaVersion": 1,
   "id": "entityoutliner",
   "version": "${version}",
-
   "name": "Entity Outliner",
   "description": "Allows you to select entity types to outline, making them visible through all obstructions within render distance.",
   "authors": [
@@ -12,10 +11,8 @@
     "homepage": "https://github.com/adamviola/EntityOutliner",
     "sources": "https://github.com/adamviola/EntityOutliner"
   },
-
   "license": "MIT",
   "icon": "assets/entityoutliner/icon.png",
-
   "environment": "client",
   "entrypoints": {
     "client": [
@@ -31,7 +28,6 @@
       "environment": "client"
     }
   ],
-
   "depends": {
     "fabricloader": ">=0.15.0",
     "fabric-api": "*",

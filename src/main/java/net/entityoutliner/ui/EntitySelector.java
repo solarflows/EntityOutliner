@@ -1,22 +1,17 @@
 package net.entityoutliner.ui;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import net.entityoutliner.EntityOutliner;
 import net.entityoutliner.ui.ColorWidget.Color;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.EntityType;
-import net.minecraft.text.Text;
+import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
+import net.minecraft.text.Text;
+
+import java.util.*;
 
 public class EntitySelector extends Screen {
     protected final Screen parent;
@@ -27,11 +22,11 @@ public class EntitySelector extends Screen {
     private static String searchText = "";
     private static Map<String, List<EntityType<?>>> searcher = new HashMap<>(); // Prefix -> arr of results
     public final static Map<EntityType<?>, Color> outlinedEntityTypes = new HashMap<>();
- 
+
     public EntitySelector(Screen parent) {
-       super(Text.translatable("title.entity-outliner.selector"));
-       this.parent = parent;
-       this.initializePrefixTree();
+        super(Text.translatable("title.entity-outliner.selector"));
+        this.parent = parent;
+        this.initializePrefixTree();
     }
 
     @Override
@@ -115,10 +110,12 @@ public class EntitySelector extends Screen {
         this.addDrawableChild(
             ButtonWidget.builder(
                 Text.translatable("button.entity-outliner.done"),
-                (button) -> { this.client.setScreen(null); }
+                (button) -> {
+                    this.client.setScreen(null);
+                }
             ).size(buttonWidth, buttonHeight).position(buttonOffset + (buttonWidth + buttonInterval) * 3, buttonY).build()
         );
-        
+
         this.setInitialFocus(this.searchField);
         this.onSearchFieldUpdate(this.searchField.getText());
     }
@@ -128,7 +125,7 @@ public class EntitySelector extends Screen {
         searcher = new HashMap<>();
 
         // Initialize no-text results
-        List<EntityType<?>> allResults =  new ArrayList<EntityType<?>>();
+        List<EntityType<?>> allResults = new ArrayList<EntityType<?>>();
         searcher.put("", allResults);
 
         // Get sorted list of entity types
@@ -137,7 +134,7 @@ public class EntitySelector extends Screen {
             entityTypes.add(entityType);
         }
         entityTypes.sort(Comparator.comparing(o -> o.getName().getString()));
-        
+
         // Add each entity type to everywhere it belongs in the prefix "tree"
         for (EntityType<?> entityType : entityTypes) {
 
@@ -185,7 +182,7 @@ public class EntitySelector extends Screen {
 
         if (searcher.containsKey(text)) {
             List<EntityType<?>> results = searcher.get(text);
-            
+
             // Splits results into categories and separates them with headers
             if (groupByCategory) {
                 HashMap<SpawnGroup, List<EntityType<?>>> resultsByCategory = new HashMap<>();
@@ -207,7 +204,7 @@ public class EntitySelector extends Screen {
                             this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.width, this.client.textRenderer));
                         }
 
-                    }      
+                    }
                 }
 
             } else {

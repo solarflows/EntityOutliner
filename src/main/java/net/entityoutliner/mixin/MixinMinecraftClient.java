@@ -17,7 +17,7 @@ public abstract class MixinMinecraftClient {
         if (EntityOutliner.outliningEntities && EntitySelector.outlinedEntityTypes != null) {
             if (EntitySelector.outlinedEntityTypes.containsKey(entity.getType())) {
                 ci.setReturnValue(true);
-            } 
+            }
         }
     }
 }

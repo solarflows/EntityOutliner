@@ -1,23 +1,11 @@
 package net.entityoutliner;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.lwjgl.glfw.GLFW;
-
-import net.entityoutliner.ui.EntitySelector;
 import net.entityoutliner.ui.ColorWidget.Color;
+import net.entityoutliner.ui.EntitySelector;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -27,6 +15,15 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityType;
 import net.minecraft.registry.Registries;
+import org.lwjgl.glfw.GLFW;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class EntityOutliner implements ClientModInitializer {
     private static final Gson GSON = new Gson();
@@ -46,8 +43,8 @@ public class EntityOutliner implements ClientModInitializer {
         "title.entity-outliner.title"
     );
 
-	@Override
-	public void onInitializeClient() {
+    @Override
+    public void onInitializeClient() {
         KeyBindingHelper.registerKeyBinding(CONFIG_BIND);
         KeyBindingHelper.registerKeyBinding(OUTLINE_BIND);
 
@@ -71,8 +68,7 @@ public class EntityOutliner implements ClientModInitializer {
 
         try {
             Files.write(getConfigPath(), GSON.toJson(config).getBytes());
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             logException(ex, "Failed to save EntityOutliner config");
         }
     }
@@ -81,18 +77,18 @@ public class EntityOutliner implements ClientModInitializer {
         try {
             JsonObject config = GSON.fromJson(new String(Files.readAllBytes(getConfigPath())), JsonObject.class);
             if (config.has("outlinedEntities")) {
-                Type setType = new TypeToken<List<List<String>>>(){}.getType();
+                Type setType = new TypeToken<List<List<String>>>() {
+                }.getType();
                 List<List<String>> outlinedEntityNames = GSON.fromJson(config.get("outlinedEntities"), setType);
 
                 Map<EntityType<?>, Color> outlinedEntityTypes = outlinedEntityNames.stream()
-                    .collect(Collectors.toMap(list -> EntityType.get(list.get(0)).get(), list -> Color.valueOf(list.get(1))));;
+                    .collect(Collectors.toMap(list -> EntityType.get(list.get(0)).get(), list -> Color.valueOf(list.get(1))));
 
                 for (EntityType<?> entityType : Registries.ENTITY_TYPE)
                     if (outlinedEntityTypes.containsKey(entityType))
                         EntitySelector.outlinedEntityTypes.put(entityType, outlinedEntityTypes.get(entityType));
             }
-        }
-        catch (IOException | JsonSyntaxException ex) {
+        } catch (IOException | JsonSyntaxException ex) {
             logException(ex, "Failed to load EntityOutliner config");
         }
     }
@@ -102,7 +98,7 @@ public class EntityOutliner implements ClientModInitializer {
             outliningEntities = !outliningEntities;
         }
 
-        if (CONFIG_BIND.isPressed()) {           
+        if (CONFIG_BIND.isPressed()) {
             client.setScreen(new EntitySelector(null));
         }
     }
