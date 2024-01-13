@@ -36,6 +36,7 @@ public class EntitySelector extends Screen {
 
     @Override
     protected void init() {
+        // Create list with full width to ensure full background
         this.list = new EntityListWidget(this.client, this.width, this.height - 64, 32, 25);
         this.addDrawableChild(list);
 
@@ -46,20 +47,8 @@ public class EntitySelector extends Screen {
         this.addDrawableChild(searchField);
 
         // Create buttons
-        int buttonWidth = 80;
-        int buttonHeight = 20;
-        int buttonInterval = (this.width - 4 * buttonWidth) / 5;
-        int buttonOffset = buttonInterval;
-        int buttonY = this.height - 16 - (buttonHeight / 2);
-
-        // Add sort type button
-        // this.addDrawableChild(new ButtonWidget(buttonOffset, buttonY, buttonWidth, buttonHeight, Text.translatable(groupByCategory ? "button.entity-outliner.categories" : "button.entity-outliner.no-categories"), (button) -> {
-        //     groupByCategory = !groupByCategory;
-        //     this.onSearchFieldUpdate(this.searchField.getText());
-        //     button.setMessage(Text.translatable(groupByCategory ? "button.entity-outliner.categories" : "button.entity-outliner.no-categories"));
-        // }));
-
-        this.addDrawableChild(
+        List<ButtonWidget.Builder> buttons = List.of(
+            // sort type
             ButtonWidget.builder(
                 Text.translatable(groupByCategory ? "button.entity-outliner.categories" : "button.entity-outliner.no-categories"),
                 (button) -> {
@@ -67,54 +56,45 @@ public class EntitySelector extends Screen {
                     this.onSearchFieldUpdate(this.searchField.getText());
                     button.setMessage(Text.translatable(groupByCategory ? "button.entity-outliner.categories" : "button.entity-outliner.no-categories"));
                 }
-            ).size(buttonWidth, buttonHeight).position(buttonOffset, buttonY).build()
-        );
+            ),
 
-        // Add Deselect All button
-        // this.addDrawableChild(new ButtonWidget(buttonOffset + (buttonWidth + buttonInterval), buttonY, buttonWidth, buttonHeight, Text.translatable("button.entity-outliner.deselect"), (button) -> {
-        //     outlinedEntityTypes.clear();
-        //     this.onSearchFieldUpdate(this.searchField.getText());
-        // }));
-
-        this.addDrawableChild(
+            // deselect
             ButtonWidget.builder(
                 Text.translatable("button.entity-outliner.deselect"),
                 (button) -> {
-                    outlinedEntityTypes.clear();
+                    EntitySelector.outlinedEntityTypes.clear();
                     this.onSearchFieldUpdate(this.searchField.getText());
                 }
-            ).size(buttonWidth, buttonHeight).position(buttonOffset + (buttonWidth + buttonInterval), buttonY).build()
-        );
+            ),
 
-        // Add toggle outlining button
-        // this.addDrawableChild(new ButtonWidget(buttonOffset + (buttonWidth + buttonInterval) * 2, buttonY, buttonWidth, buttonHeight, Text.translatable(EntityOutliner.outliningEntities ? "button.entity-outliner.on" : "button.entity-outliner.off"), (button) -> {
-        //     EntityOutliner.outliningEntities = !EntityOutliner.outliningEntities;
-        //     button.setMessage(Text.translatable(EntityOutliner.outliningEntities ? "button.entity-outliner.on" : "button.entity-outliner.off"));
-        // }));
-
-        this.addDrawableChild(
+            // toggle outlining
             ButtonWidget.builder(
                 Text.translatable(EntityOutliner.outliningEntities ? "button.entity-outliner.on" : "button.entity-outliner.off"),
                 (button) -> {
                     EntityOutliner.outliningEntities = !EntityOutliner.outliningEntities;
                     button.setMessage(Text.translatable(EntityOutliner.outliningEntities ? "button.entity-outliner.on" : "button.entity-outliner.off"));
                 }
-            ).size(buttonWidth, buttonHeight).position(buttonOffset + (buttonWidth + buttonInterval) * 2, buttonY).build()
-        );
+            ),
 
-        // Add Done button
-        // this.addDrawableChild(new ButtonWidget(buttonOffset + (buttonWidth + buttonInterval) * 3, buttonY, buttonWidth, buttonHeight, Text.translatable("button.entity-outliner.done"), (button) -> {
-        //     this.client.setScreen(null);
-        // }));
-
-        this.addDrawableChild(
+            // done
             ButtonWidget.builder(
                 Text.translatable("button.entity-outliner.done"),
-                (button) -> {
-                    this.client.setScreen(null);
-                }
-            ).size(buttonWidth, buttonHeight).position(buttonOffset + (buttonWidth + buttonInterval) * 3, buttonY).build()
+                (button) -> this.close()
+            )
         );
+
+        final int width = 80;
+        final int height = 20;
+        final int offset = (this.width / buttons.size());
+        int x = (offset - width) / 2;
+        final int y = this.height - 16 - (height / 2);
+        for (ButtonWidget.Builder builder : buttons) {
+            this.addDrawableChild(builder.size(width, height)
+                .position(x, y)
+                .build()
+            );
+            x += offset;
+        }
 
         this.setInitialFocus(this.searchField);
         this.onSearchFieldUpdate(this.searchField.getText());
@@ -198,10 +178,10 @@ public class EntitySelector extends Screen {
 
                 for (SpawnGroup category : SpawnGroup.values()) {
                     if (resultsByCategory.containsKey(category)) {
-                        this.list.addListEntry(EntityListWidget.HeaderEntry.create(category, this.client.textRenderer, this.width, 25));
+                        this.list.addListEntry(EntityListWidget.HeaderEntry.create(category, this.client.textRenderer));
 
                         for (EntityType<?> entityType : resultsByCategory.get(category)) {
-                            this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.width, this.client.textRenderer));
+                            this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.client.textRenderer));
                         }
 
                     }
@@ -209,11 +189,11 @@ public class EntitySelector extends Screen {
 
             } else {
                 for (EntityType<?> entityType : results) {
-                    this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.width, this.client.textRenderer));
+                    this.list.addListEntry(EntityListWidget.EntityEntry.create(entityType, this.client.textRenderer));
                 }
             }
         } else { // If there are no results, let the user know
-            this.list.addListEntry(EntityListWidget.HeaderEntry.create(null, this.client.textRenderer, this.width, 25));
+            this.list.addListEntry(EntityListWidget.HeaderEntry.create(null, this.client.textRenderer));
         }
 
         // This prevents an overscroll when the user is already scrolled down and the results list is shortened

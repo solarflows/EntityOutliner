@@ -8,15 +8,12 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.CheckboxWidget;
-import net.minecraft.client.gui.widget.ElementListWidget;
-import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.gui.widget.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
-import net.minecraft.util.Language;
+import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -42,7 +39,8 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
 
     @Override
     protected int getScrollbarPositionX() {
-        return super.getScrollbarPositionX() + 32;
+        // make positioning more flexible
+        return (this.width + this.getRowWidth()) / 2 + 14;
     }
 
     @Environment(EnvType.CLIENT)
@@ -51,67 +49,49 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
 
     @Environment(EnvType.CLIENT)
     public static class EntityEntry extends EntityListWidget.Entry {
+        private final static int DEFAULT_SIZE = 20;
 
         private final CheckboxWidget checkbox;
         private final ColorWidget color;
-        private final EntityType<?> entityType;
-        private final List<PressableWidget> children = new ArrayList<>();
+        private final List<PressableWidget> children;
 
-        private EntityEntry(CheckboxWidget checkbox, ColorWidget color, EntityType<?> entityType) {
+        private EntityEntry(CheckboxWidget checkbox, ColorWidget color) {
             this.checkbox = checkbox;
-            this.entityType = entityType;
             this.color = color;
-
-            this.children.add(checkbox);
-            if (EntitySelector.outlinedEntityTypes.containsKey(entityType))
-                this.children.add(color);
+            this.children = List.of(this.checkbox, this.color);
         }
 
-        public static EntityListWidget.EntityEntry create(EntityType<?> entityType, int width, TextRenderer font) {
+        public static EntityListWidget.EntityEntry create(EntityType<?> entityType, TextRenderer font) {
+            final boolean visible = EntitySelector.outlinedEntityTypes.containsKey(entityType);
+
+            final ColorWidget color = new ColorWidget(0, 0, DEFAULT_SIZE, DEFAULT_SIZE, entityType);
+            color.visible = visible;
+
             final CheckboxWidget checkbox = CheckboxWidget.builder(entityType.getName(), font)
-                .pos(width / 2 - 155, 0)
-                .checked(EntitySelector.outlinedEntityTypes.containsKey(entityType))
+                .checked(visible)
+                .callback((source, checked) -> {
+                    color.visible = checked;
+                    if (!checked) {
+                        EntitySelector.outlinedEntityTypes.remove(entityType);
+                    } else {
+                        EntitySelector.outlinedEntityTypes.put(entityType, Color.of(entityType.getSpawnGroup()));
+                    }
+                })
                 .build();
-            checkbox.setWidth(310);
-            checkbox.setHeight(20);
-            return new EntityListWidget.EntityEntry(
-                checkbox,
-                new ColorWidget(width / 2 + 130, 0, 310, 20, entityType),
-                entityType
-            );
+
+            return new EntityListWidget.EntityEntry(checkbox, color);
         }
 
         @Override
         public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-            this.checkbox.setY(y);
-            this.checkbox.render(context, mouseX, mouseY, tickDelta);
+            final int gap = 5;
+            this.checkbox.setWidth(entryWidth - this.color.getWidth() - gap);
 
-            if (this.children.contains(this.color)) {
-                this.color.setY(y);
-                this.color.render(context, mouseX, mouseY, tickDelta);
+            for (ClickableWidget c : this.children) {
+                c.setDimensionsAndPosition(c.getWidth(), entryHeight, x, y);
+                c.render(context, mouseX, mouseY, tickDelta);
+                x += c.getWidth() + gap;
             }
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (EntitySelector.outlinedEntityTypes.containsKey(entityType)) {
-                if (this.color.isMouseOver(mouseX, mouseY)) {
-                    this.color.onPress();
-                } else {
-                    EntitySelector.outlinedEntityTypes.remove(entityType);
-
-                    this.checkbox.onPress();
-                    this.children.remove(this.color);
-                }
-            } else {
-                EntitySelector.outlinedEntityTypes.put(entityType, Color.of(entityType.getSpawnGroup()));
-
-                this.color.onShow();
-                this.checkbox.onPress();
-                this.children.add(this.color);
-            }
-
-            return true;
         }
 
         @Override
@@ -128,52 +108,45 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
     @Environment(EnvType.CLIENT)
     public static class HeaderEntry extends EntityListWidget.Entry {
 
-        private final TextRenderer font;
-        private final String title;
-        private final int width;
-        private final int height;
+        private final TextWidget title;
+        private final List<TextWidget> children;
 
-        private HeaderEntry(SpawnGroup category, TextRenderer font, int width, int height) {
-            this.font = font;
-            this.width = width;
-            this.height = height;
-
-            if (category != null) {
-                StringBuilder title = new StringBuilder();
-                for (String term : category.getName().split("\\p{Punct}|\\p{Space}")) {
-                    title.append(StringUtils.capitalize(term));
-                    title.append(' ');
-                }
-                title.deleteCharAt(title.length() - 1);
-                this.title = title.toString();
-            } else {
-                this.title = Language.getInstance().get("gui.entity-outliner.no_results");
-            }
-
+        private HeaderEntry(TextWidget title) {
+            this.title = title;
+            this.children = List.of(title);
         }
 
-        public static EntityListWidget.HeaderEntry create(SpawnGroup category, TextRenderer font, int width, int height) {
-            return new EntityListWidget.HeaderEntry(category, font, width, height);
+        public static EntityListWidget.HeaderEntry create(SpawnGroup category, TextRenderer font) {
+            Text title;
+            if (category != null) {
+                StringBuilder builder = new StringBuilder();
+                for (String term : category.getName().split("\\p{Punct}|\\p{Space}")) {
+                    builder.append(StringUtils.capitalize(term));
+                    builder.append(' ');
+                }
+                builder.deleteCharAt(builder.length() - 1);
+                title = Text.of(builder.toString());
+            } else {
+                title = Text.translatable("gui.entity-outliner.no_results");
+            }
+            TextWidget text = new TextWidget(title, font);
+            return new EntityListWidget.HeaderEntry(text);
         }
 
         @Override
-        public void render(DrawContext context, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            context.drawCenteredTextWithShadow(this.font, this.title, this.width / 2, j + (this.height / 2) - (this.font.fontHeight / 2), 16777215);
+        public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
+            this.title.setDimensionsAndPosition(entryWidth, entryHeight, x, y);
+            this.title.render(context, mouseX, mouseY, tickDelta);
         }
 
         @Override
         public List<? extends Element> children() {
-            return new ArrayList<>();
-        }
-
-        @Override
-        public String toString() {
-            return this.title;
+            return this.children;
         }
 
         @Override
         public List<? extends Selectable> selectableChildren() {
-            return new ArrayList<>();
+            return List.of();
         }
     }
 }
