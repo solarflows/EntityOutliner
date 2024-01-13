@@ -7,9 +7,13 @@
   "authors": [
     "adamviola"
   ],
+  "contributors": [
+    "n0rbyt3"
+  ],
   "contact": {
     "homepage": "https://github.com/adamviola/EntityOutliner",
-    "sources": "https://github.com/adamviola/EntityOutliner"
+    "sources": "https://github.com/adamviola/EntityOutliner",
+    "issues": "https://github.com/adamviola/EntityOutliner/issues"
   },
   "license": "MIT",
   "icon": "assets/entityoutliner/icon.png",
@@ -35,6 +39,6 @@
     "java": ">=17"
   },
   "suggests": {
-    "flamingo": "*"
+    "modmenu": "*"
   }
 }
