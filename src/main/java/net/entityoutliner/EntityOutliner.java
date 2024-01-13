@@ -21,6 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,7 +65,7 @@ public class EntityOutliner implements ClientModInitializer {
         EntityType.ZOMBIFIED_PIGLIN
     );
 
-    public static boolean shouldOutline(Entity entity) {
+    public static boolean shouldOutline(@Nonnull Entity entity) {
         if (!outliningEntities) {
             return false;
         }
@@ -134,11 +135,12 @@ public class EntityOutliner implements ClientModInitializer {
         });
     }
 
-    private static boolean isNotificationEnabled(EntityType<?> entityType) {
+    private static boolean isNotificationEnabled(@Nonnull EntityType<?> entityType) {
         final OutlineConfig outlineConfig = entityTypeOutlineConfig.get(entityType);
         return outlineConfig != null && outlineConfig.isNotification();
     }
 
+    @Nonnull
     private static Path getConfigPath() {
         return FabricLoader.getInstance().getConfigDir().resolve("entityoutliner.json");
     }
@@ -197,7 +199,7 @@ public class EntityOutliner implements ClientModInitializer {
         }
     }
 
-    public static void logException(Throwable ex, String message) {
+    public static void logException(@Nonnull Throwable ex, @Nonnull String message) {
         System.err.printf("[EntityOutliner] %s (%s: %s)", message, ex.getClass().getSimpleName(), ex.getLocalizedMessage());
     }
 }

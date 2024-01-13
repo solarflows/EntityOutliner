@@ -18,17 +18,19 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> {
 
-    public EntityListWidget(MinecraftClient client, int width, int height, int y, int itemHeight) {
+    public EntityListWidget(@Nullable MinecraftClient client, int width, int height, int y, int itemHeight) {
         super(client, width, height, y, itemHeight);
         this.centerListVertically = false;
     }
 
-    public void addListEntry(EntityListWidget.Entry entry) {
+    public void addListEntry(@Nonnull EntityListWidget.Entry entry) {
         super.addEntry(entry);
     }
 
@@ -59,7 +61,7 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
         private final ClickableWidget[] options;
         private final List<ClickableWidget> children;
 
-        private EntityEntry(CheckboxWidget checkbox, ClickableWidget... options) {
+        private EntityEntry(@Nonnull CheckboxWidget checkbox, @Nonnull ClickableWidget... options) {
             this.checkbox = checkbox;
             this.options = options;
 
@@ -69,7 +71,8 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
             this.children = List.of(children);
         }
 
-        public static EntityListWidget.EntityEntry create(EntityType<?> entityType, TextRenderer font) {
+        @Nonnull
+        public static EntityListWidget.EntityEntry create(@Nonnull EntityType<?> entityType, @Nonnull TextRenderer font) {
             final boolean visible = EntityOutliner.entityTypeOutlineConfig.containsKey(entityType);
             final OutlineConfig outlineConfig = EntityOutliner.entityTypeOutlineConfig.getOrDefault(entityType, OutlineConfig.of(entityType));
 
@@ -151,12 +154,13 @@ public class EntityListWidget extends ElementListWidget<EntityListWidget.Entry> 
         private final TextWidget title;
         private final List<TextWidget> children;
 
-        private HeaderEntry(TextWidget title) {
+        private HeaderEntry(@Nonnull TextWidget title) {
             this.title = title;
             this.children = List.of(title);
         }
 
-        public static EntityListWidget.HeaderEntry create(SpawnGroup category, TextRenderer font) {
+        @Nonnull
+        public static EntityListWidget.HeaderEntry create(@Nullable SpawnGroup category, @Nonnull TextRenderer font) {
             Text title;
             if (category != null) {
                 StringBuilder builder = new StringBuilder();

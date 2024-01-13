@@ -8,20 +8,25 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 @Environment(EnvType.CLIENT)
 public class ColorWidget extends ToggleWidget<Color> {
 
-    public ColorWidget(int size, Color value, Callback<Color> callback) {
+    public ColorWidget(int size, @Nonnull Color value, @Nonnull Callback<Color> callback) {
         super(size, value, callback, Text.translatable("options.chat.color"));
     }
 
+    @Nonnull
     @Override
-    protected Color getNextValue(final Color previous) {
+    protected Color getNextValue(@Nonnull final Color previous) {
         return Color.colors[(previous.ordinal() + 1) % Color.colors.length];
     }
 
+    @Nullable
     @Override
-    protected Tooltip getTooltip(final Color value) {
+    protected Tooltip getTooltip(@Nonnull final Color value) {
         return null;
     }
 

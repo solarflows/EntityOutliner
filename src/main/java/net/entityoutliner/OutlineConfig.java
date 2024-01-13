@@ -4,6 +4,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
 
+import javax.annotation.Nonnull;
+
 @Environment(EnvType.CLIENT)
 public class OutlineConfig {
 
@@ -11,17 +13,18 @@ public class OutlineConfig {
     private boolean notification;
     private EntityAge age;
 
-    public OutlineConfig(Color color, boolean notification, EntityAge age) {
+    public OutlineConfig(@Nonnull Color color, boolean notification, @Nonnull EntityAge age) {
         this.color = color;
         this.notification = notification;
         this.age = age;
     }
 
+    @Nonnull
     public Color getColor() {
         return this.color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(@Nonnull Color color) {
         this.color = color;
     }
 
@@ -33,15 +36,17 @@ public class OutlineConfig {
         this.notification = notification;
     }
 
+    @Nonnull
     public EntityAge getAge() {
         return this.age;
     }
 
-    public void setAge(EntityAge age) {
+    public void setAge(@Nonnull EntityAge age) {
         this.age = age;
     }
 
-    public static OutlineConfig of(EntityType<?> entityType) {
+    @Nonnull
+    public static OutlineConfig of(@Nonnull EntityType<?> entityType) {
         return new OutlineConfig(Color.of(entityType.getSpawnGroup()), false, EntityAge.BOTH);
     }
 }

@@ -3,6 +3,8 @@ package net.entityoutliner;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -12,7 +14,8 @@ public enum EntityAge {
 
     public final static EntityAge[] ages = values();
 
-    public static Optional<EntityAge> of(String name) {
+    @Nonnull
+    public static Optional<EntityAge> of(@Nullable String name) {
         return Arrays.stream(values())
             .filter(c -> c.name().equals(name))
             .findFirst();

@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer {
 
@@ -48,7 +51,8 @@ public abstract class MixinWorldRenderer {
         }
     }
 
-    private static Integer getTeamColor(Entity entity) {
+    @Nullable
+    private static Integer getTeamColor(@Nonnull Entity entity) {
         final Team team = entity.getScoreboardTeam();
         if (team == null) {
             return null;

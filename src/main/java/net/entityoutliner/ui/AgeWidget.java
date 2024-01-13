@@ -7,6 +7,9 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 @Environment(EnvType.CLIENT)
 public class AgeWidget extends TextureToggleWidget<EntityAge> {
     private final static Identifier TEXTURE = new Identifier("entityoutliner", "textures/gui/age_widget.png");
@@ -14,10 +17,11 @@ public class AgeWidget extends TextureToggleWidget<EntityAge> {
     private final static Tooltip TOOLTIP_ADULT = Tooltip.of(Text.translatable("button.entity-outliner.age.tooltip-adult"));
     private final static Tooltip TOOLTIP_BOTH = Tooltip.of(Text.translatable("button.entity-outliner.age.tooltip-both"));
 
-    public AgeWidget(int size, EntityAge value, Callback<EntityAge> callback) {
+    public AgeWidget(int size, @Nonnull EntityAge value, @Nonnull Callback<EntityAge> callback) {
         super(size, value, callback, Text.empty());
     }
 
+    @Nonnull
     @Override
     protected Identifier getTexture() {
         return TEXTURE;
@@ -33,18 +37,20 @@ public class AgeWidget extends TextureToggleWidget<EntityAge> {
         return EntityAge.ages.length;
     }
 
+    @Nonnull
     @Override
-    protected EntityAge getNextValue(final EntityAge previous) {
+    protected EntityAge getNextValue(@Nonnull final EntityAge previous) {
         return EntityAge.ages[(previous.ordinal() + 1) % EntityAge.ages.length];
     }
 
     @Override
-    protected int getValueIndex(final EntityAge value) {
+    protected int getValueIndex(@Nonnull final EntityAge value) {
         return value.ordinal();
     }
 
+    @Nullable
     @Override
-    protected Tooltip getTooltip(final EntityAge value) {
+    protected Tooltip getTooltip(@Nonnull final EntityAge value) {
         return switch (value) {
             case BABY -> TOOLTIP_BABY;
             case ADULT -> TOOLTIP_ADULT;

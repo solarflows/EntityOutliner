@@ -10,6 +10,8 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class EntitySelector extends Screen {
@@ -21,7 +23,7 @@ public class EntitySelector extends Screen {
     private static String searchText = "";
     private static Map<String, List<EntityType<?>>> searcher = new HashMap<>(); // Prefix -> arr of results
 
-    public EntitySelector(Screen parent) {
+    public EntitySelector(@Nullable Screen parent) {
         super(Text.translatable("title.entity-outliner.selector"));
         this.parent = parent;
         this.initializePrefixTree();
@@ -163,7 +165,7 @@ public class EntitySelector extends Screen {
     }
 
     // Callback provided to TextFieldWidget triggered when its text updates
-    private void onSearchFieldUpdate(String text) {
+    private void onSearchFieldUpdate(@Nonnull String text) {
         searchText = text;
         text = text.toLowerCase().trim();
 

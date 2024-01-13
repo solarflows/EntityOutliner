@@ -6,20 +6,23 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
+import javax.annotation.Nonnull;
+
 @Environment(EnvType.CLIENT)
 abstract class TextureToggleWidget<V> extends ToggleWidget<V> {
 
-    protected TextureToggleWidget(int size, V value, Callback<V> callback, Text text) {
+    protected TextureToggleWidget(int size, @Nonnull V value, @Nonnull Callback<V> callback, Text text) {
         super(size, value, callback, text);
     }
 
+    @Nonnull
     abstract protected Identifier getTexture();
 
     abstract protected int getTextureSize();
 
     abstract protected int getTotalTextures();
 
-    abstract protected int getValueIndex(V value);
+    abstract protected int getValueIndex(@Nonnull V value);
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {

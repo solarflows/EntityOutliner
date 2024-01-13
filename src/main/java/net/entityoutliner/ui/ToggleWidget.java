@@ -7,21 +7,26 @@ import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.text.Text;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 @Environment(EnvType.CLIENT)
 abstract class ToggleWidget<V> extends ClickableWidget {
     protected V value;
     private final Callback<V> callback;
 
-    protected ToggleWidget(int size, V value, Callback<V> callback, Text text) {
+    protected ToggleWidget(int size, @Nonnull V value, @Nonnull Callback<V> callback, Text text) {
         super(0, 0, size, size, text);
         this.callback = callback;
 
         setValue(value);
     }
 
-    abstract protected V getNextValue(V previous);
+    @Nonnull
+    abstract protected V getNextValue(@Nonnull V previous);
 
-    abstract protected Tooltip getTooltip(V value);
+    @Nullable
+    abstract protected Tooltip getTooltip(@Nonnull V value);
 
     @Override
     public void onClick(double mouseX, double mouseY) {
@@ -31,7 +36,7 @@ abstract class ToggleWidget<V> extends ClickableWidget {
         }
     }
 
-    protected void setValue(V value) {
+    protected void setValue(@Nonnull V value) {
         this.value = value;
         this.setTooltip(getTooltip(this.value));
     }
@@ -43,6 +48,6 @@ abstract class ToggleWidget<V> extends ClickableWidget {
     @Environment(EnvType.CLIENT)
     public interface Callback<V> {
 
-        void onChange(ToggleWidget<V> source, V value);
+        void onChange(@Nonnull ToggleWidget<V> source, @Nonnull V value);
     }
 }

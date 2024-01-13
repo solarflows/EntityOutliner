@@ -5,6 +5,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.util.math.ColorHelper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -44,13 +46,15 @@ public enum Color {
         this.blue = blue;
     }
 
-    public static Optional<Color> of(String name) {
+    @Nonnull
+    public static Optional<Color> of(@Nullable String name) {
         return Arrays.stream(colors)
             .filter(c -> c.name().equals(name))
             .findFirst();
     }
 
-    public static Color of(SpawnGroup group) {
+    @Nonnull
+    public static Color of(@Nullable SpawnGroup group) {
         return spawnGroupColors.getOrDefault(group, Color.RED);
     }
 
