@@ -1,6 +1,5 @@
 package net.entityoutliner.ui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.DrawContext;
@@ -9,13 +8,12 @@ import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 
 import java.util.Map;
 
 @Environment(EnvType.CLIENT)
 public class ColorWidget extends PressableWidget {
-    private static final Identifier TEXTURE = new Identifier("entityoutliner:textures/gui/colors.png");
     private Color color;
     private final EntityType<?> entityType;
 
@@ -43,10 +41,10 @@ public class ColorWidget extends PressableWidget {
 
     @Override
     protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        context.drawTexture(TEXTURE, this.getX(), this.getY(), this.isFocused() ? 20.0F : 0.0F, this.color.ordinal() * 20, 20, 20, 40, 180);
+        int color = ColorHelper.Argb.getArgb(255, this.color.red, this.color.green, this.color.blue);
+        context.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color);
+        Color border = this.isFocused() ? Color.WHITE : Color.BLACK;
+        context.drawBorder(this.getX(), this.getY(), this.getWidth(), this.getHeight(), ColorHelper.Argb.getArgb(255, border.red, border.green, border.blue));
     }
 
     public enum Color {
