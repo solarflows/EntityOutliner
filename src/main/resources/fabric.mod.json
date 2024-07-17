@@ -2,27 +2,36 @@
   "schemaVersion": 1,
   "id": "entityoutliner",
   "version": "${version}",
-
   "name": "Entity Outliner",
   "description": "Allows you to select entity types to outline, making them visible through all obstructions within render distance.",
   "authors": [
-    "adamviola"
+    {
+      "name": "Adam Viola",
+      "contact": {
+        "homepage": "https://github.com/adamviola"
+      }
+    }
+  ],
+  "contributors": [
+    "Columner",
+    "CofiPRT",
+    "n0rbyt3",
+    "fr_fr: Calvineries",
+    "zh_cn: GodGun968"
   ],
   "contact": {
     "homepage": "https://github.com/adamviola/EntityOutliner",
     "sources": "https://github.com/adamviola/EntityOutliner"
   },
-
   "license": "MIT",
   "icon": "assets/entityoutliner/icon.png",
-
   "environment": "client",
   "entrypoints": {
     "client": [
       "net.entityoutliner.EntityOutliner"
     ],
     "modmenu": [
-      "net.entityoutliner.ui.ModMenuIntegration"
+      "net.entityoutliner.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -31,15 +40,13 @@
       "environment": "client"
     }
   ],
-
   "depends": {
-    "fabricloader": ">=0.7.4",
-    "fabric": "*",
-    "fabric-lifecycle-events-v1": "*",
-    "fabric-key-binding-api-v1": "*",
-    "minecraft": ">=1.19"
+    "fabricloader": ">=0.15.0",
+    "fabric-api": "*",
+    "minecraft": "~1.20.4",
+    "java": ">=17"
   },
   "suggests": {
-    "flamingo": "*"
+    "modmenu": "*"
   }
 }
